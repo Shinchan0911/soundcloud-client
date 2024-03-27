@@ -2,8 +2,13 @@
 
 ## Preview
 
+## Discord Rich Presence
 ![Preview Image1](./images/preview1.png)
+
+## Extension
 ![Preview Image2](./images/preview2.png)
+
+## Information
 ![Preview Image3](./images/preview3.png)
 
 ## License
