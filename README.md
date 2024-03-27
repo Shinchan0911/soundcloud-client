@@ -1,4 +1,4 @@
-# SoudCloud - A Soundcloud client with Discord Rich Presence support
+# SoudCloud - A Soundcloud client with Discord Rich Presence and more
 
 ## Discord Rich Presence:
 ![Preview Image1](./images/preview1.png)
