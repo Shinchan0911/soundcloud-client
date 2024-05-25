@@ -35,11 +35,6 @@ function openInformationWindow() {
             spanElement.textContent += "${app.getVersion()}";
         `);
     });
-
-
-    infoWindow.on("closed", () => {
-        infoWindow = null;
-    });
 }
 
 module.exports = { createWindow, openInformationWindow };
