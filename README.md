@@ -12,3 +12,5 @@
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+## [Data storage of SoundCloud Client](https://github.com/Shinchan0911/soundcloud-client-data)
