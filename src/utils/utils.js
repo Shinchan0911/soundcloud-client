@@ -1,5 +1,7 @@
 const axios = require('axios');
 const { app, dialog } = require('electron');
+const url = require('url');
+const store = require('../config/config');
 
 function convertTimeToSeconds(time) {
     const parts = time.split(":").map(parseFloat);
@@ -16,21 +18,6 @@ function shortenString(str, maxLength = 128) {
     return str.length > maxLength ? str.substring(0, maxLength - 3) + "..." : str;
 }
 
-async function checkForUpdate(mainWindow) {
-    try {
-        const response = await axios.get('https://raw.githubusercontent.com/Shinchan0911/soundcloud-client/main/package.json');
-        const data = response.data;
-        const latestVersion = data.version;
-        const currentVersion = app.getVersion();
-
-        if (latestVersion !== currentVersion) {
-            injectToastNotification(`Current Version: ${currentVersion}, Latest Version: ${latestVersion} - A new version is available.`, mainWindow);
-        }
-    } catch (error) {
-        showErrorDialog(error.message);
-    }
-}
-
 async function getData() {
     try {
         const response = await axios.get('https://raw.githubusercontent.com/Shinchan0911/soundcloud-client-data/main/data.json');
@@ -39,6 +26,41 @@ async function getData() {
         return data;
     } catch (error) {
         showErrorDialog(error.message);
+    }
+}
+
+async function checkForUpdate(mainWindow) {
+    try {
+        const globalData = await getData();
+        const response = await axios.get('https://raw.githubusercontent.com/Shinchan0911/soundcloud-client/main/package.json');
+        const data = response.data;
+        const latestVersion = data.version;
+        const currentVersion = app.getVersion();
+
+        if (latestVersion !== currentVersion) {
+            injectToastNotification(`Current Version: ${currentVersion}, Latest Version: ${latestVersion} - A new version is available.`, mainWindow);
+        } else {
+            injectToastNotification(globalData.notification, mainWindow);
+        }
+
+    } catch (error) {
+        showErrorDialog(error.message);
+    }
+}
+
+async function getClientId_SCL(session) {
+    try {
+        await axios.get(`https://api-v2.soundcloud.com/announcements?client_id=${store.get("clientId_SCL")}`);
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            const data = await getData();
+            session.defaultSession.webRequest.onBeforeRequest(data.filter.getClientId_SCL, (details, callback) => {          
+                const parsedUrl = url.parse(details.url, true);
+                const clientId = parsedUrl.query.client_id;
+                store.set("clientId_SCL", clientId);
+                callback({});
+            });
+        }
     }
 }
 
@@ -84,4 +106,4 @@ function injectToastNotification(message, mainWindow) {
     }
 }
 
-module.exports = { convertTimeToSeconds, removeQueryParameters, checkForUpdate, injectToastNotification, shortenString, showErrorDialog, getData };
+module.exports = { convertTimeToSeconds, removeQueryParameters, checkForUpdate, injectToastNotification, shortenString, showErrorDialog, getData, getClientId_SCL };

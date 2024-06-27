@@ -6,7 +6,8 @@ const store = new Store({
         darkMode: false,
         discordRPC: true,
         displayWhenIdling: true,
-        adBlocker: true
+        adBlocker: true,
+        clientId_SCL: null
     },
 });
 

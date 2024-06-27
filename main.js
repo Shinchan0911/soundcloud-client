@@ -1,8 +1,8 @@
-const { app, Menu, shell } = require("electron");
+const { app, Menu, shell, session } = require("electron");
 const store = require("./src/config/config");
 const { toggleRPC, updateRPCActivity } = require("./src/features/rpc");
 const { createAdBlocker, toggleAdBlocker } = require("./src/features/adBlocker");
-const { checkForUpdate, removeQueryParameters, getData } = require("./src/utils/utils");
+const { checkForUpdate, removeQueryParameters, getData, getClientId_SCL } = require("./src/utils/utils");
 const { downloadSong } = require("./src/features/downloadSong");
 const { createWindow, openInformationWindow } = require("./src/windows/windows");
 const { toggleDarkMode, createDarkMode } = require('./src/features/DarkMode');
@@ -22,6 +22,8 @@ app.on("ready", async () => {
         
         await createAdBlocker(mainWindow);
         await createDarkMode(mainWindow);
+
+        await getClientId_SCL(session);
 
         setInterval(async () => {
             const isPlaying = await mainWindow.webContents.executeJavaScript(
@@ -58,7 +60,7 @@ app.on("ready", async () => {
                         const songEl = document.querySelector('.playbackSoundBadge__titleLink').getAttribute('href');
                         resolve("https://soundcloud.com" + songEl);
                     });
-                `), data.Parameters);
+                `), data.filter.getSongUrl);
 
                 const time = await mainWindow.webContents.executeJavaScript(`
                     new Promise((resolve) => {
@@ -131,8 +133,13 @@ function createMenu(mainWindow) {
         {
             label: 'Download Song',
             click: () => {
-                downloadSong(mainWindow, songUrl, data.clientId_SCL);
+                downloadSong(mainWindow, songUrl, store.get("clientId_SCL"));
             }
+        },
+        {
+            label: 'Refresh',
+            accelerator: 'F5',
+            click: () => mainWindow.reload(),
         },
         {
             label: 'Github',

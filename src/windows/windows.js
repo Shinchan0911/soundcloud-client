@@ -35,6 +35,7 @@ function openInformationWindow() {
             spanElement.textContent += "${app.getVersion()}";
         `);
     });
+
 }
 
 module.exports = { createWindow, openInformationWindow };
