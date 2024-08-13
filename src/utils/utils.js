@@ -106,4 +106,60 @@ function injectToastNotification(message, mainWindow) {
     }
 }
 
-module.exports = { convertTimeToSeconds, removeQueryParameters, checkForUpdate, injectToastNotification, shortenString, showErrorDialog, getData, getClientId_SCL };
+function injectNavigationButtons(mainWindow) {
+    if (mainWindow) {
+        mainWindow.webContents.executeJavaScript(`
+        (function() {
+            if (document.getElementById('navigation-buttons')) {
+                return;
+            }
+
+            const navContainer = document.createElement('div');
+            navContainer.id = 'navigation-buttons';
+            navContainer.style.position = 'fixed';
+            navContainer.style.top = '10px';
+            navContainer.style.left = '10px';
+            navContainer.style.zIndex = '9999';
+            navContainer.style.display = 'flex';
+            navContainer.style.gap = '10px';
+
+            const backButton = document.createElement('button');
+            backButton.id = 'back-button';
+            backButton.textContent = '◄';
+            backButton.style.fontSize = '16px';
+            backButton.style.width = '30px';
+            backButton.style.height = '30px';
+            backButton.style.border = 'none';
+            backButton.style.backgroundColor = 'transparent';
+            backButton.style.color = '#ffffff';
+            backButton.style.cursor = 'pointer';
+            backButton.style.boxShadow = 'none';
+
+            const forwardButton = document.createElement('button');
+            forwardButton.id = 'forward-button';
+            forwardButton.textContent = '►';
+            forwardButton.style.fontSize = '16px';
+            forwardButton.style.width = '30px';
+            forwardButton.style.height = '30px';
+            forwardButton.style.border = 'none';
+            forwardButton.style.backgroundColor = 'transparent';
+            forwardButton.style.color = '#ffffff';
+            forwardButton.style.cursor = 'pointer';
+            forwardButton.style.boxShadow = 'none';
+
+            navContainer.appendChild(backButton);
+            navContainer.appendChild(forwardButton);
+            document.body.appendChild(navContainer);
+
+            backButton.addEventListener('click', () => {
+                window.history.back();
+            });
+
+            forwardButton.addEventListener('click', () => {
+                window.history.forward();
+            });
+        })();`);
+    }
+}
+
+module.exports = { convertTimeToSeconds, removeQueryParameters, checkForUpdate, injectToastNotification, shortenString, showErrorDialog, getData, getClientId_SCL, injectNavigationButtons };

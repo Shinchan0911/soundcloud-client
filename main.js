@@ -1,8 +1,8 @@
-const { app, Menu, shell, session } = require("electron");
+const { app, Menu, shell, session, protocol } = require("electron");
 const store = require("./src/config/config");
 const { toggleRPC, updateRPCActivity } = require("./src/features/rpc");
 const { createAdBlocker, toggleAdBlocker } = require("./src/features/adBlocker");
-const { checkForUpdate, removeQueryParameters, getData, getClientId_SCL } = require("./src/utils/utils");
+const { checkForUpdate, removeQueryParameters, getData, getClientId_SCL, injectNavigationButtons } = require("./src/utils/utils");
 const { downloadSong } = require("./src/features/downloadSong");
 const { createWindow, openInformationWindow } = require("./src/windows/windows");
 const { toggleDarkMode, createDarkMode } = require('./src/features/DarkMode');
@@ -10,6 +10,7 @@ const { toggleDarkMode, createDarkMode } = require('./src/features/DarkMode');
 let mainWindow;
 let songUrl;
 let data;
+
 
 app.on("ready", async () => {
     mainWindow = await createWindow(store);
@@ -19,11 +20,10 @@ app.on("ready", async () => {
 
     mainWindow.webContents.on("did-finish-load", async () => {
         await checkForUpdate(mainWindow);
-        
         await createAdBlocker(mainWindow);
         await createDarkMode(mainWindow);
-
         await getClientId_SCL(session);
+        await injectNavigationButtons(mainWindow);
 
         setInterval(async () => {
             const isPlaying = await mainWindow.webContents.executeJavaScript(
@@ -158,4 +158,5 @@ function createMenu(mainWindow) {
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
+
 }
